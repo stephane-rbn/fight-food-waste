@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\User;
 use Core\Controller;
 use Core\View;
 
@@ -14,8 +15,28 @@ use Core\View;
  */
 class RegisterController extends Controller
 {
+    /**
+     * Show the register page
+     *
+     * @return void
+     */
     public function new()
     {
         View::renderTemplate('Register/new.html.twig');
+    }
+
+    /**
+     * Register a new user
+     *
+     * @return void
+     */
+    public function create()
+    {
+//        s($_POST);
+        $user = new User($_POST);
+
+        $user->save();
+
+        View::renderTemplate('Register/success.html.twig');
     }
 }

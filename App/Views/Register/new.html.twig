@@ -6,4 +6,50 @@
 
     <h1>Register</h1>
 
+    <form method="POST" action="/register/create">
+        <div>
+            <label for="inputFirstName">First name</label>
+            <input type="text" id="inputFirstName" name="firstName" placeholder="First name" autofocus required>
+        </div>
+
+        <div>
+            <label for="inputMiddleName">Middle name</label>
+            <input type="text" id="inputMiddleName" name="middleName" placeholder="Middle name">
+        </div>
+
+        <div>
+            <label for="inputLastName">Last name</label>
+            <input type="text" id="inputLastName" name="lastName" placeholder="Last name" required>
+        </div>
+
+        <div>
+            <label for="inputEmail">Email</label>
+            <input type="email" id="inputEmail" name="email" placeholder="Email">
+        </div>
+
+        <div>
+            <label for="inputPhoneNumber">Phone number</label>
+            <input type="text" id="inputPhoneNumber" name="phoneNumber" placeholder="Phone number" required>
+        </div>
+
+        <div>
+            <label for="inputCompanyName">Company name</label>
+            <input type="text" id="inputCompanyName" name="companyName" placeholder="Company name">
+        </div>
+
+        <div>
+            <label for="inputPassword">Password</label>
+            <input type="password" id="inputPassword" name="password" placeholder="Password">
+        </div>
+
+        <div>
+            <label for="inputPasswordConfirmation">Repeat password</label>
+            <input type="password" id="inputPasswordConfirmation" name="passwordConfirmation"
+                   placeholder="Repeat password">
+        </div>
+
+        <button type="submit">Register</button>
+    </form>
+
+
 {% endblock %}
