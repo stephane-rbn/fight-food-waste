@@ -1,0 +1,14 @@
+# Ignore IDE settings
+.idea
+.vscode
+
+# Ignore logs files
+logs/*
+!logs/.keep
+
+# Ignore dependencies
+vendor
+composer.lock
+
+# Ignore dotenv file
+.env

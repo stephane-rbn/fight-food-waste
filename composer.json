@@ -1,0 +1,15 @@
+{
+    "require": {
+        "twig/twig": "^2.0",
+        "vlucas/phpdotenv": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Core\\": "Core/",
+            "App\\": "App/"
+        }
+    },
+    "require-dev": {
+        "kint-php/kint": "^3.1"
+    }
+}
