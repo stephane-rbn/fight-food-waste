@@ -84,7 +84,7 @@ class Config
     /**
      * Show or hide error messages on screen
      *
-     * @return boolean
+     * @return bool
      */
     static function showErrors()
     {
