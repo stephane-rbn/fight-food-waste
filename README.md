@@ -7,3 +7,17 @@
 - Create a `.env` file at the root of the project based on the `.env.example` file
 - Install Composer and then run: `composer install` in your terminal
 - Run `composer dump-autoload`
+- Configure the web server by changing its root the `/public` folder. My setup:
+
+```sh
+# /etc/hosts
+127.0.0.1    fight-food-waste.lan
+```
+
+```sh
+# /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
+<VirtualHost *:80>
+    DocumentRoot "/Applications/MAMP/htdocs/fight-food-waste/public"
+    ServerName fight-food-waste.lan
+</VirtualHost>
+```
