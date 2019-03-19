@@ -4,7 +4,7 @@
 
 - Create your MySQL database (with Adminer or phpMyAdmin)
 - Run the SQL code located in `schema_build.sql`
-- Create a `.env` file at the root of the project based on the `.env.example` file
+- Create a file `.env` at the root of the project based on the `.env.example` file
 - Install Composer and then run: `composer install` in your terminal
 - Run `composer dump-autoload`
 - Enable URL rewriting by uncommenting this line in your httpd.conf file. My setup:
@@ -14,7 +14,7 @@
 LoadModule rewrite_module modules/mod_rewrite.so`
 ```
 
-- Configure the web server by changing its root the `/public` folder. My setup:
+- Configure the web server by changing its root to the `/public` folder. My setup:
 
 ```sh
 # /etc/hosts
