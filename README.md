@@ -11,7 +11,7 @@
 
 ```sh
 # /Applications/MAMP/conf/Apache/httpd.conf
-LoadModule rewrite_module modules/mod_rewrite.so`
+LoadModule rewrite_module modules/mod_rewrite.so
 ```
 
 - Configure the web server by changing its root to the `/public` folder. My setup:
