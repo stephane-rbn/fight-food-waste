@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helper\Helper;
 use Core\Model;
 use PDO;
 
@@ -51,11 +52,11 @@ class User extends Model
                   (`unique_id`, `first_name`, `middle_name`, `last_name`, `email`, `company_name`, `phone_number`, `password`, `created_at`)
                   VALUES (:unique_id, :first_name, :middle_name, :last_name, :email, :company_name, :phone_number, :password, :created_at)';
 
-//        $connection = static::getDB();
+            // $connection = static::getDB();
             $connection = parent::getDB();
             $stmt = $connection->prepare($query);
 
-            $stmt->bindValue(':unique_id', uniqid(), PDO::PARAM_STR);
+            $stmt->bindValue(':unique_id', Helper::generateUniqueId(), PDO::PARAM_STR);
             $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
             $stmt->bindValue(':middle_name', $this->middleName, PDO::PARAM_STR);
             $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);

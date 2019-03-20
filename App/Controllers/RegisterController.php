@@ -32,7 +32,7 @@ class RegisterController extends Controller
      */
     public function create()
     {
-//        s($_POST);
+        // s($_POST);
         $user = new User($_POST);
 
         if ($user->save()) {
