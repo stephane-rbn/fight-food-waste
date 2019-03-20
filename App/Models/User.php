@@ -54,19 +54,19 @@ class User extends Model
 
             // $connection = static::getDB();
             $connection = parent::getDB();
-            $stmt = $connection->prepare($query);
+            $statement = $connection->prepare($query);
 
-            $stmt->bindValue(':unique_id', Helper::generateUniqueId(), PDO::PARAM_STR);
-            $stmt->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
-            $stmt->bindValue(':middle_name', $this->middleName, PDO::PARAM_STR);
-            $stmt->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
-            $stmt->bindValue(':email', $this->email, PDO::PARAM_STR);
-            $stmt->bindValue(':company_name', $this->companyName, PDO::PARAM_STR);
-            $stmt->bindValue(':phone_number', $this->phoneNumber, PDO::PARAM_STR);
-            $stmt->bindValue(':password', $passwordHash, PDO::PARAM_STR);
-            $stmt->bindValue(':created_at', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $statement->bindValue(':unique_id', Helper::generateUniqueId(), PDO::PARAM_STR);
+            $statement->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
+            $statement->bindValue(':middle_name', $this->middleName, PDO::PARAM_STR);
+            $statement->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
+            $statement->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $statement->bindValue(':company_name', $this->companyName, PDO::PARAM_STR);
+            $statement->bindValue(':phone_number', $this->phoneNumber, PDO::PARAM_STR);
+            $statement->bindValue(':password', $passwordHash, PDO::PARAM_STR);
+            $statement->bindValue(':created_at', date('Y-m-d H:i:s'), PDO::PARAM_STR);
 
-            return $stmt->execute();
+            return $statement->execute();
 
         }
 
@@ -100,27 +100,11 @@ class User extends Model
             $this->errors[] = 'Last name should be between 2 and 60 characters in length.';
         }
 
-        // Email validation: format
+        // Email validation: format and uniqueness
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             $this->errors[] = 'Email format should be valid.';
-        } else {
-            // Email validation: uniqueness
-
-            // Database connection
-            $connection = parent::getDB();
-
-            // Query that returns 1 every time it founds this email
-            $query = $connection->prepare("SELECT 1 FROM donors WHERE email= :email");
-
-            // Execute
-            $query->execute(['email' => $this->email]);
-
-            // Fetch data with the query
-            $result = $query->fetch();
-
-            if (!empty($result)) {
-                $this->errors[] = 'Email already used.';
-            }
+        } else if ($this->emailExists($this->email)) {
+            $this->errors[] = 'Email already used.';
         }
 
         // Phone number validation
@@ -158,5 +142,27 @@ class User extends Model
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * See if a user record already exists with the specified email
+     *
+     * @param string $email email address to search for
+     *
+     * @return bool True if a record already exists with the specified email, false otherwise
+     */
+    private function emailExists($email)
+    {
+        // Database connection
+        $connection = parent::getDB();
+
+        $query = 'SELECT * FROM `donors` WHERE email = :email';
+
+        $statement = $connection->prepare($query);
+        $statement->bindParam(':email', $email, PDO::PARAM_STR);
+
+        $statement->execute();
+
+        return $statement->fetch() !== false;
     }
 }
