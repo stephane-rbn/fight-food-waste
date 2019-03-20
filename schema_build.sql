@@ -1,6 +1,6 @@
 CREATE TABLE `donors` (
   `id`           INTEGER PRIMARY KEY AUTO_INCREMENT,
-  `unique_id`    VARCHAR(14) NOT NULL,
+  `unique_id`    VARCHAR(32) NOT NULL,
   `first_name`   VARCHAR(60) NOT NULL,
   `middle_name`  VARCHAR(60),
   `last_name`    VARCHAR(60) NOT NULL,
