@@ -6,35 +6,44 @@
 
     <h1>Register</h1>
 
+    {% if user.errors is not empty %}
+        <p>Errors:</p>
+        <ul>
+            {% for error in user.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     <form method="POST" action="/register/create">
         <div>
             <label for="inputFirstName">First name</label>
-            <input type="text" id="inputFirstName" name="firstName" placeholder="First name" autofocus required>
+            <input type="text" id="inputFirstName" name="firstName" placeholder="First name" value="{{ user.firstName }}" autofocus required>
         </div>
 
         <div>
             <label for="inputMiddleName">Middle name</label>
-            <input type="text" id="inputMiddleName" name="middleName" placeholder="Middle name">
+            <input type="text" id="inputMiddleName" name="middleName" placeholder="Middle name" value="{{ user.middleName }}">
         </div>
 
         <div>
             <label for="inputLastName">Last name</label>
-            <input type="text" id="inputLastName" name="lastName" placeholder="Last name" required>
+            <input type="text" id="inputLastName" name="lastName" placeholder="Last name" value="{{ user.lastName }}" required>
         </div>
 
         <div>
             <label for="inputEmail">Email</label>
-            <input type="email" id="inputEmail" name="email" placeholder="Email">
+            <input type="email" id="inputEmail" name="email" placeholder="Email" value="{{ user.email }}">
         </div>
 
         <div>
             <label for="inputPhoneNumber">Phone number</label>
-            <input type="text" id="inputPhoneNumber" name="phoneNumber" placeholder="Phone number" required>
+            <input type="text" id="inputPhoneNumber" name="phoneNumber" placeholder="Phone number" value="{{ user.phoneNumber }}" required>
         </div>
 
         <div>
             <label for="inputCompanyName">Company name</label>
-            <input type="text" id="inputCompanyName" name="companyName" placeholder="Company name">
+            <input type="text" id="inputCompanyName" name="companyName" placeholder="Company name" value="{{ user.companyName }}">
         </div>
 
         <div>
