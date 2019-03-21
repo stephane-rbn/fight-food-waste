@@ -37,7 +37,7 @@ class RegisterController extends Controller
         if ($user->save()) {
             View::renderTemplate('Register/success.html.twig');
         } else {
-            // s($user->getErrors());
+            s($user->getErrors());
             View::renderTemplate('Register/new.html.twig', [
                 'user' => $user,
             ]);

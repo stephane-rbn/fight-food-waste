@@ -21,6 +21,62 @@ class User extends Model
     private $errors = [];
 
     /**
+     * User first name
+     *
+     * @var string
+     */
+    public $firstName;
+
+    /**
+     * User middle name
+     *
+     * @var string
+     */
+    public $middleName;
+
+    /**
+     * User last name
+     *
+     * @var string
+     */
+    public $lastName;
+
+    /**
+     * User email
+     *
+     * @var string
+     */
+    public $email;
+
+    /**
+     * User company
+     *
+     * @var string
+     */
+    public $companyName;
+
+    /**
+     * User phone number
+     *
+     * @var string
+     */
+    public $phoneNumber;
+
+    /**
+     * User password
+     *
+     * @var string
+     */
+    private $password;
+
+    /**
+     * User password confirmation
+     *
+     * @var string
+     */
+    private $passwordConfirmation;
+
+    /**
      * User constructor
      *
      * @param array $data Initial property values
