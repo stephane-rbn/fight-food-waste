@@ -10,16 +10,11 @@
 - Enable URL rewriting by uncommenting this line in your httpd.conf file. My setup:
 
 ```sh
-# /Applications/MAMP/conf/Apache/httpd.conf
+# /Applications/MAMP/conf/apache/httpd.conf
 LoadModule rewrite_module modules/mod_rewrite.so
 ```
 
 - Configure the web server by changing its root to the `/public` folder. My setup:
-
-```sh
-# /etc/hosts
-127.0.0.1    fight-food-waste.lan
-```
 
 ```sh
 # /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
@@ -28,3 +23,15 @@ LoadModule rewrite_module modules/mod_rewrite.so
     ServerName fight-food-waste.lan
 </VirtualHost>
 ```
+
+```sh
+# /etc/hosts
+127.0.0.1    fight-food-waste.lan
+```
+
+Enable Virtual Hosts: 
+```sh
+# uncomment this line in /Applications/MAMP/conf/apache/httpd.conf
+Include /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
+```
+
