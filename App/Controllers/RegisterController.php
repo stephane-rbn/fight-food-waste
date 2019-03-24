@@ -35,12 +35,23 @@ class RegisterController extends Controller
         $user = new User($_POST);
 
         if ($user->save()) {
-            View::renderTemplate('Register/success.html.twig');
+            header('Location: http://' . $_SERVER['HTTP_HOST'] . '/register/success', true, 303);
+            exit;
         } else {
             s($user->getErrors());
             View::renderTemplate('Register/new.html.twig', [
                 'user' => $user,
             ]);
         }
+    }
+
+    /**
+     * Show the register success page
+     *
+     * @return void
+     */
+    public function success()
+    {
+        View::renderTemplate('Register/success.html.twig');
     }
 }
