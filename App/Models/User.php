@@ -104,26 +104,19 @@ class User extends Model
 
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
-            $query = 'INSERT INTO `donors`
-                  (`unique_id`, `first_name`, `middle_name`, `last_name`, `email`, `company_name`, `phone_number`, `password`, `created_at`)
-                  VALUES (:unique_id, :first_name, :middle_name, :last_name, :email, :company_name, :phone_number, :password, :created_at)';
+            $fields = [
+                'unique_id'    => Helper::generateUniqueId(),
+                'first_name'   => $this->firstName,
+                'middle_name'  => $this->middleName,
+                'last_name'    => $this->lastName,
+                'email'        => $this->email,
+                'company_name' => $this->companyName,
+                'phone_number' => $this->phoneNumber,
+                'password'     => $passwordHash,
+                'created_at'   => date('Y-m-d H:i:s'),
+            ];
 
-            // $connection = static::getDB();
-            $connection = parent::getDB();
-            $statement = $connection->prepare($query);
-
-            $statement->bindValue(':unique_id', Helper::generateUniqueId(), PDO::PARAM_STR);
-            $statement->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
-            $statement->bindValue(':middle_name', $this->middleName, PDO::PARAM_STR);
-            $statement->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
-            $statement->bindValue(':email', $this->email, PDO::PARAM_STR);
-            $statement->bindValue(':company_name', $this->companyName, PDO::PARAM_STR);
-            $statement->bindValue(':phone_number', $this->phoneNumber, PDO::PARAM_STR);
-            $statement->bindValue(':password', $passwordHash, PDO::PARAM_STR);
-            $statement->bindValue(':created_at', date('Y-m-d H:i:s'), PDO::PARAM_STR);
-
-            return $statement->execute();
-
+            return parent::insert('donors', $fields);
         }
 
         return false;
@@ -131,6 +124,8 @@ class User extends Model
 
     /**
      * Validate current property values, adding validation error messages to the errors array property
+     *
+     * @return void
      */
     public function validate()
     {
