@@ -48,7 +48,9 @@
 
         <div>
             <label for="inputPassword">Password</label>
-            <input type="password" id="inputPassword" name="password" placeholder="Password" required>
+            <input type="password" id="inputPassword" name="password" placeholder="Password"
+                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                   title="Minimum 8 chars, at least one letter and number." required>
         </div>
 
         <div>
