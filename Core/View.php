@@ -4,8 +4,6 @@ namespace Core;
 
 /**
  * View
- *
- * PHP version 7.2
  */
 class View
 {

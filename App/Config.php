@@ -12,8 +12,6 @@ $dotEnv->load();
 
 /**
  * Application configuration
- *
- * PHP version 7.2
  */
 class Config
 {

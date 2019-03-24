@@ -6,8 +6,6 @@ use Exception;
 
 /**
  * Router
- *
- * PHP version 7.2
  */
 class Router
 {

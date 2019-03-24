@@ -4,8 +4,7 @@ namespace App\Helper;
 
 /**
  * Helper class
- *
- * PHP version 7.2
+
  */
 class Helper
 {

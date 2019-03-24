@@ -6,8 +6,6 @@ use Exception;
 
 /**
  * Base Controller
- *
- * PHP version 7.2
  */
 abstract class Controller
 {

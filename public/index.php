@@ -6,8 +6,6 @@ use Core\Router;
  * Front controller
  *
  * Routing
- *
- * PHP version 7.2
  */
 
 /**

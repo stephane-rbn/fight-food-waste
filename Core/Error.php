@@ -6,8 +6,6 @@ use App\Config;
 
 /**
  * Error and exception handler
- *
- * PHP version 7.2
  */
 class Error
 {

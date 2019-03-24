@@ -8,8 +8,6 @@ use PDO;
 
 /**
  * User model
- *
- * PHP version 7.2
  */
 class User extends Model
 {
