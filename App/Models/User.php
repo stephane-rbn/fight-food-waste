@@ -154,7 +154,7 @@ class User extends Model
         // Email validation: format and uniqueness
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             $this->errors[] = 'Email format should be valid.';
-        } else if ($this->emailExists($this->email)) {
+        } else if (self::emailExists($this->email)) {
             $this->errors[] = 'Email already used.';
         }
 
@@ -202,7 +202,7 @@ class User extends Model
      *
      * @return bool True if a record already exists with the specified email, false otherwise
      */
-    private function emailExists($email)
+    public static function emailExists($email)
     {
         // Database connection
         $connection = parent::getDB();
