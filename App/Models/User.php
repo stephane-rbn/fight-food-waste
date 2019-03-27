@@ -81,7 +81,7 @@ class User extends Model
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($data = [])
     {
         foreach ($data as $key => $value) {
             $this->$key = $value;
@@ -202,16 +202,52 @@ class User extends Model
      */
     public static function emailExists($email)
     {
+        return self::findByEmail($email) !== false;
+    }
+
+    /**
+     * See if a user already exists with the specified email
+     *
+     * @param string $email email address to search for
+     *
+     * @return mixed User object if found, false otherwise
+     */
+    public static function findByEmail($email)
+    {
+        $query = 'SELECT * FROM `donors` WHERE email = :email';
+
         // Database connection
         $connection = parent::getDB();
-
-        $query = 'SELECT * FROM `donors` WHERE email = :email';
 
         $statement = $connection->prepare($query);
         $statement->bindParam(':email', $email, PDO::PARAM_STR);
 
+        // Return a class instead of an array for this statement
+        $statement->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
         $statement->execute();
 
-        return $statement->fetch() !== false;
+        return $statement->fetch();
+    }
+
+    /**
+     * Authenticate a user by email and password
+     *
+     * @param string $email
+     * @param string $password
+     *
+     * @return mixed The user object or false if authentication failes
+     */
+    public static function authenticate($email, $password)
+    {
+        $user = self::findByEmail(trim(strtolower($email)));
+
+        if ($user) {
+            if (password_verify($password, $user->password)) {
+                return $user;
+            }
+        }
+
+        return false;
     }
 }

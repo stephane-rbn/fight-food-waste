@@ -7,7 +7,6 @@ use Core\Controller;
 use Core\View;
 
 /**
- *
  * Register Controller
  */
 class RegisterController extends Controller
@@ -32,8 +31,7 @@ class RegisterController extends Controller
         $user = new User($_POST);
 
         if ($user->save()) {
-            header('Location: http://' . $_SERVER['HTTP_HOST'] . '/register/success', true, 303);
-            exit;
+            $this->redirect('/register/success');
         } else {
             s($user->getErrors());
             View::renderTemplate('Register/new.html.twig', [
