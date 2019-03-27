@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Auth;
+use App\Flash;
 use App\Models\User;
 use Core\Controller;
 use Core\View;
@@ -35,9 +36,13 @@ class LoginController extends Controller
 
             Auth::login($user);
 
+            Flash::addMessage('Login successful');
+
             $this->redirect(Auth::getReturnToPage());
 
         } else {
+
+            Flash::addMessage('Login unsuccessful, please try again');
 
             View::renderTemplate('Login/new.html.twig', [
                 'email' => $_POST['email'],
@@ -46,9 +51,26 @@ class LoginController extends Controller
         }
     }
 
+    /**
+     * Log out a user
+     *
+     * @return void
+     */
     public function destroy()
     {
         Auth::logout();
+
+        $this->redirect('/login/show-logout-message');
+    }
+
+    /**
+     * Show a "logged out" flash message and redirect to homepage
+     *
+     * @return void
+     */
+    public function showLogoutMessage()
+    {
+        Flash::addMessage('Logout successful');
 
         $this->redirect('/');
     }
