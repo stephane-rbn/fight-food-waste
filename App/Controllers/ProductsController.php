@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use AuthenticatedController;
 use Core\View;
 
 /**

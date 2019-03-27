@@ -214,13 +214,31 @@ class User extends Model
      */
     public static function findByEmail($email)
     {
-        $query = 'SELECT * FROM `donors` WHERE email = :email';
+        $sql = 'SELECT * FROM `donors` WHERE email = :email';
 
         // Database connection
         $connection = parent::getDB();
 
-        $statement = $connection->prepare($query);
+        $statement = $connection->prepare($sql);
         $statement->bindParam(':email', $email, PDO::PARAM_STR);
+
+        // Return a class instead of an array for this statement
+        $statement->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
+        $statement->execute();
+
+        return $statement->fetch();
+    }
+
+    public static function findByID($id)
+    {
+        $sql = 'SELECT * FROM `donors` WHERE id = :id';
+
+        // Database connection
+        $connection = parent::getDB();
+
+        $statement = $connection->prepare($sql);
+        $statement->bindValue(':id', $id, PDO::PARAM_INT);
 
         // Return a class instead of an array for this statement
         $statement->setFetchMode(PDO::FETCH_CLASS, get_called_class());

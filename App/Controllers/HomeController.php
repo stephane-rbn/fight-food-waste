@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Auth;
 use Core\Controller;
 use Core\View;
 
@@ -31,9 +32,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        View::renderTemplate('Home/index.html.twig', [
-            'name'   => 'stephanyan',
-            'colors' => ['red', 'green', 'blue'],
-        ]);
+        View::renderTemplate('Home/index.html.twig');
     }
 }
