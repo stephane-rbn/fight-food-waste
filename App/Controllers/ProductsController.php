@@ -2,14 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Auth;
-use Core\Controller;
+use AuthenticatedController;
 use Core\View;
 
 /**
  * Products controller
  */
-class ProductsController extends Controller
+class ProductsController extends AuthenticatedController
 {
     /**
      * Product index
@@ -18,8 +17,6 @@ class ProductsController extends Controller
      */
     public function index()
     {
-       $this->requireLogin();
-
         View::renderTemplate('Products/index.html.twig');
     }
 }
