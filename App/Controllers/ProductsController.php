@@ -18,11 +18,7 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        if (!Auth::isLoggedIn()) {
-            Auth::rememberRequestedPage();
-
-            $this->redirect('/login');
-        }
+       $this->requireLogin();
 
         View::renderTemplate('Products/index.html.twig');
     }
