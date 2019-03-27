@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use App\Auth;
+
 /**
  * View
  */
@@ -45,6 +47,7 @@ class View
             $loader = new \Twig_Loader_Filesystem(dirname(__DIR__) . '/App/Views');
             $twig = new \Twig_Environment($loader);
             $twig->addGlobal('session', $_SESSION);
+            $twig->addGlobal('is_logged_in', Auth::isLoggedIn());
         }
 
         echo $twig->render($template, $arguments);
