@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Welcome</h1>
 
-    {% if is_logged_in %}
+    {% if current_user %}
 
         Hello {{ current_user.first_name }}.
 
