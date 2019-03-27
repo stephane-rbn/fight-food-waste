@@ -92,7 +92,7 @@ abstract class Controller
     public function requireLogin()
     {
         if (!Auth::getUser()) {
-            Flash::addMessage('Please log in to access that page');
+            Flash::addMessage('Please log in to access that page', Flash::INFO);
 
             Auth::rememberRequestedPage();
 

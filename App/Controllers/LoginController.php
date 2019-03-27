@@ -42,7 +42,7 @@ class LoginController extends Controller
 
         } else {
 
-            Flash::addMessage('Login unsuccessful, please try again');
+            Flash::addMessage('Login unsuccessful, please try again', Flash::WARNING);
 
             View::renderTemplate('Login/new.html.twig', [
                 'email' => $_POST['email'],
