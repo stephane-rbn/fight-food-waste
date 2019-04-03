@@ -8,7 +8,6 @@ logs/*
 
 # Ignore dependencies
 vendor
-composer.lock
 
 # Ignore dotenv file
 .env
