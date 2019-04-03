@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Helper\Helper;
+use App\Token;
 use Core\Model;
+use Exception;
 use PDO;
 
 /**
@@ -17,6 +19,13 @@ class User extends Model
      * @var array
      */
     private $errors = [];
+
+    /**
+     * User id
+     *
+     * @var int
+     */
+    public $id;
 
     /**
      * User first name
@@ -75,6 +84,20 @@ class User extends Model
     private $passwordConfirmation;
 
     /**
+     * User authentication token value
+     *
+     * @var string
+     */
+    public $rememberToken;
+
+    /**
+     * User authentication token expiry
+     *
+     * @var string
+     */
+    public $expiryTimestamp;
+
+    /**
      * User constructor
      *
      * @param array $data Initial property values
@@ -99,7 +122,6 @@ class User extends Model
         $this->validate();
 
         if (empty($this->errors)) {
-
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
             $fields = [
@@ -134,19 +156,19 @@ class User extends Model
 
         // First name validation
         if (strlen($this->firstName) < 2 || strlen($this->firstName) > 60) {
-            $this->errors[] = 'First name should be between 2 and 60 characters in length.';
+            $this->errors[] = 'First name should be between 1 and 60 characters in length.';
         }
 
         // Middle name validation (optional)
         if ($this->middleName !== '') {
             if (strlen($this->middleName) < 2 || strlen($this->middleName) > 60) {
-                $this->errors[] = 'Middle name should be between 2 and 60 characters in length.';
+                $this->errors[] = 'Middle name should be between 1 and 60 characters in length.';
             }
         }
 
         // Last name validation
         if (strlen($this->lastName) < 2 || strlen($this->lastName) > 60) {
-            $this->errors[] = 'Last name should be between 2 and 60 characters in length.';
+            $this->errors[] = 'Last name should be between 1 and 60 characters in length.';
         }
 
         // Email validation: format and uniqueness
@@ -230,6 +252,11 @@ class User extends Model
         return $statement->fetch();
     }
 
+    /**
+     * @param int $id
+     *
+     * @return mixed
+     */
     public static function findByID($id)
     {
         $sql = 'SELECT * FROM `donors` WHERE id = :id';
@@ -267,5 +294,30 @@ class User extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Remember the login by inserting a new unique token into
+     * the remembered logins table for the user record
+     *
+     * @return bool True if the login was remembered successfully, false otherwise
+     * @throws Exception
+     */
+    public function rememberLogin()
+    {
+        $token = new Token();
+        $hashToken = $token->getHash();
+        $this->rememberToken = $token->getValue();
+
+        // 30 days from now
+        $this->expiryTimestamp = time() + 60 * 60 * 24 * 30;
+
+        $fields = [
+            'token_hash' => $hashToken,
+            'donor_id'   => $this->id,
+            'expires_at' => date('Y-m-d H:i:s', $this->expiryTimestamp),
+        ];
+
+        return parent::insert('remembered_logins', $fields);
     }
 }

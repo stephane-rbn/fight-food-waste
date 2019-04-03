@@ -7,6 +7,7 @@ use App\Flash;
 use App\Models\User;
 use Core\Controller;
 use Core\View;
+use Exception;
 
 /**
  * Login Controller
@@ -27,27 +28,27 @@ class LoginController extends Controller
      * Log in a user
      *
      * @return void
+     * @throws Exception
      */
     public function create()
     {
         $user = User::authenticate($_POST['email'], $_POST['password']);
 
-        if ($user) {
+        $rememberMe = isset($_POST['rememberMe']);
 
-            Auth::login($user);
+        if ($user) {
+            Auth::login($user, $rememberMe);
 
             Flash::addMessage('Login successful');
 
             $this->redirect(Auth::getReturnToPage());
-
         } else {
-
             Flash::addMessage('Login unsuccessful, please try again', Flash::WARNING);
 
             View::renderTemplate('Login/new.html.twig', [
                 'email' => $_POST['email'],
+                'remember_me' => $rememberMe,
             ]);
-
         }
     }
 
@@ -55,6 +56,7 @@ class LoginController extends Controller
      * Log out a user
      *
      * @return void
+     * @throws Exception
      */
     public function destroy()
     {

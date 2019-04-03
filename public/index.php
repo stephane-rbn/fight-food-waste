@@ -5,7 +5,6 @@ use Core\Router;
 /**
  * Front controller
  *
- * Routing
  */
 
 /**

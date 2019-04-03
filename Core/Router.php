@@ -106,7 +106,7 @@ class Router
      *
      * @param string $url The route URL
      *
-     * @return string The URL with the query string variables removed
+     * @return void
      * @throws Exception
      */
     public function dispatch($url)

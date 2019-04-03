@@ -15,3 +15,9 @@ CREATE TABLE `donors` (
   `created_at`   DATETIME,
   `updated_at`   DATETIME
 );
+
+CREATE TABLE `remembered_logins` (
+  `token_hash` VARCHAR(64) PRIMARY KEY,
+  `donor_id`   INTEGER NOT NULL REFERENCES `donors` (`id`) ON DELETE CASCADE,
+  `expires_at` DATETIME
+);

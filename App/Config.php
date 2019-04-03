@@ -94,4 +94,20 @@ class Config
 
         return $showErrors;
     }
+
+    /**
+     * Secret key for hashing
+     *
+     * @return string|null
+     */
+    static function secretKey()
+    {
+        static $secretKey = null;
+
+        if ($secretKey === null) {
+            $secretKey = $_ENV['SECRET_KEY_FOR_HASHING'];
+        }
+
+        return $secretKey;
+    }
 }

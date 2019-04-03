@@ -3,6 +3,8 @@
 namespace Core;
 
 use App\Config;
+use ErrorException;
+use Exception;
 
 /**
  * Error and exception handler
@@ -18,19 +20,19 @@ class Error
      * @param int $line Line number in the file
      *
      * @return void
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public static function errorHandler($level, $message, $file, $line)
     {
         if (error_reporting() !== 0) {
-            throw new \ErrorException($message, 0, $level, $file, $line);
+            throw new ErrorException($message, 0, $level, $file, $line);
         }
     }
 
     /**
      * Exception handler
      *
-     * @param \Exception $exception The exception
+     * @param Exception $exception The exception
      *
      * @return void
      */

@@ -20,14 +20,12 @@ abstract class Model
         static $connection = null;
 
         if ($connection === null) {
-
             $dsn = 'mysql:host=' . Config::dbHost() . ';dbname=' . Config::dbName() . ';charset=utf8';
 
             $connection = new PDO($dsn, Config::dbUser(), Config::dbPwd());
 
             // Throw an Exception when a database error occurs
             $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         }
 
         return $connection;
@@ -58,8 +56,15 @@ abstract class Model
             $paramId = 1;
 
             if (count($params)) {
+
                 foreach ($params as $param) {
-                    $statement->bindValue($paramId, $param, PDO::PARAM_STR);
+
+                    if (is_int($param)) {
+                        $statement->bindValue($paramId, $param, PDO::PARAM_INT);
+                    } else {
+                        $statement->bindValue($paramId, $param, PDO::PARAM_STR);
+                    }
+
                     $paramId++;
                 }
             }
@@ -175,10 +180,11 @@ abstract class Model
             $values[] = $value;
         }
 
+        $table = '`' . $table . '`';
         $fieldString = rtrim($fieldString, ',');
         $valueString = rtrim($valueString, ',');
 
-        $sql = "INSERT INTO `{$table}` ({$fieldString}) VALUES ({$valueString})";
+        $sql = "INSERT INTO {$table} ({$fieldString}) VALUES ({$valueString})";
 
         return self::query($sql, $values)->execute();
     }
