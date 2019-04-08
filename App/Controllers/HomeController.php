@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Mail;
 use Core\Controller;
 use Core\View;
 
@@ -31,6 +32,8 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // Mail::send('rabena.stephane@gmail.com', 'Test', 'This is a test', '<h1>This is a test</h1>');
+
         View::renderTemplate('Home/index.html.twig');
     }
 }
