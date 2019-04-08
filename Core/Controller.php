@@ -88,6 +88,7 @@ abstract class Controller
      * Remember the requested page for later, then redirect to the login page.
      *
      * @return void
+     * @throws Exception
      */
     public function requireLogin()
     {
