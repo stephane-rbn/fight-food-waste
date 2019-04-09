@@ -41,4 +41,16 @@ class PasswordController extends Controller
 
         View::renderTemplate('Password/reset_requested.html.twig');
     }
+
+    /**
+     * Show the reset password form
+     *
+     * @return void
+     */
+    public function reset()
+    {
+        $token = $this->getRouteParams()['token'];
+
+        s($token);
+    }
 }
