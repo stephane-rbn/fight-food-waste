@@ -53,15 +53,11 @@ class PasswordController extends Controller
     {
         $token = $this->getRouteParams()['token'];
 
-        $user = User::findByPasswordReset($token);
+        $user = $this->getUserOrExit($token);
 
-        if ($user) {
-            View::renderTemplate('Password/reset.html.twig', [
-                'token' => $token,
-            ]);
-        } else {
-            echo 'Password reset token invalid';
-        }
+        View::renderTemplate('Password/reset.html.twig', [
+            'token' => $token,
+        ]);
     }
 
     /**
@@ -74,12 +70,28 @@ class PasswordController extends Controller
     {
         $token = $_POST['token'];
 
+        $user = $this->getUserOrExit($token);
+
+        echo "Reset user's password here";
+    }
+
+    /**
+     * Find the user model associated with the password reset token, or end the request with a message
+     *
+     * @param string $token
+     *
+     * @return mixed User object if found and the token hasn't expired, null otherwise
+     * @throws Exception
+     */
+    private function getUserOrExit($token)
+    {
         $user = User::findByPasswordReset($token);
 
         if ($user) {
-            echo "Reset user's password here";
+            return $user;
         } else {
-            echo 'Password reset token invalid';
+            View::renderTemplate('Password/token_expired.html.twig');
+            exit;
         }
     }
 }
