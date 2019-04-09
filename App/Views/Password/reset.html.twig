@@ -15,7 +15,10 @@
         </ul>
     {% endif %}
 
-    <form method="POST">
+    <form action="/password/reset-password" method="POST">
+
+        <input type="hidden" name="token" value="{{ token }}">
+
         <div>
             <label for="inputPassword">Password</label>
             <input type="password" id="inputPassword" name="password" placeholder="Password"
@@ -24,6 +27,7 @@
         </div>
 
         <button type="submit">Reset password</button>
+
     </form>
 
 

@@ -56,7 +56,28 @@ class PasswordController extends Controller
         $user = User::findByPasswordReset($token);
 
         if ($user) {
-            View::renderTemplate('Password/reset.html.twig');
+            View::renderTemplate('Password/reset.html.twig', [
+                'token' => $token,
+            ]);
+        } else {
+            echo 'Password reset token invalid';
+        }
+    }
+
+    /**
+     * Reset the user's password
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function resetPassword()
+    {
+        $token = $_POST['token'];
+
+        $user = User::findByPasswordReset($token);
+
+        if ($user) {
+            echo "Reset user's password here";
         } else {
             echo 'Password reset token invalid';
         }
