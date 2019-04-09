@@ -4,6 +4,9 @@ namespace Core;
 
 use App\Auth;
 use App\Flash;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * View
@@ -35,12 +38,30 @@ class View
      * Render a view template using Twig
      *
      * @param string $template The template file
-     * @param array $arguments Associative array of data to display in the view
+     * @param array $arguments Associative array of data to display in the view (optional)
      *
      * @return void
-     * @throws
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public static function renderTemplate($template, $arguments = [])
+    {
+        echo self::getTemplate($template, $arguments);
+    }
+
+    /**
+     * Get the contents of a view template using Twig
+     *
+     * @param string $template The template file
+     * @param array $arguments Associative array of data to display in the view (optional)
+     *
+     * @return string
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public static function getTemplate($template, $arguments = [])
     {
         static $twig = null;
 
@@ -51,6 +72,6 @@ class View
             $twig->addGlobal('flash_messages', Flash::getMessages());
         }
 
-        echo $twig->render($template, $arguments);
+        return $twig->render($template, $arguments);
     }
 }

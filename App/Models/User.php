@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use App\Helper\Helper;
+use App\Mail;
 use App\Token;
 use Core\Model;
+use Core\View;
 use Exception;
 use PDO;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * User model
@@ -96,6 +101,13 @@ class User extends Model
      * @var string
      */
     public $expiryTimestamp;
+
+    /**
+     * User password reset token
+     *
+     * @var string
+     */
+    public $passwordResetToken;
 
     /**
      * User constructor
@@ -319,5 +331,71 @@ class User extends Model
         ];
 
         return parent::insert('remembered_logins', $fields);
+    }
+
+    /**
+     * Send password reset instructions to the user specified
+     *
+     * @param string $email The email address
+     *
+     * @return void
+     */
+    public static function sendPasswordReset($email)
+    {
+        $user = self::findByEmail($email);
+
+        if ($user) {
+            if ($user->startPasswordReset()) {
+                $user->sendPasswordResetEmail();
+            }
+        }
+    }
+
+    /**
+     * Start the password reset process by generating a new token and expiry
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function startPasswordReset()
+    {
+        $token = new Token();
+        $hashedToken = $token->getHash();
+        $this->passwordResetToken = $token->getValue();
+
+        // 2 hours from now
+        $expiryTimestamp = time() + 60 * 60 * 2;
+
+        $sql = 'UPDATE `donors`
+                SET `password_reset_hash` = :token_hash,
+                    `password_reset_expiry` = :expires_at
+                WHERE `id` = :id';
+
+        $connection = self::getDB();
+        $statement = $connection->prepare($sql);
+
+        $statement->bindValue(':token_hash', $hashedToken, PDO::PARAM_STR);
+        $statement->bindValue(':expires_at', date('Y-m-d H:i:s', $expiryTimestamp), PDO::PARAM_STR);
+        $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+
+        return $statement->execute();
+    }
+
+    /**
+     * Send password reset instructions in an email to the user
+     *
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    protected function sendPasswordResetEmail()
+    {
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->passwordResetToken;
+
+        $text = View::getTemplate('Password/reset_email.txt', ['url' => $url]);
+        $html = View::getTemplate('Password/reset_email.html.twig', ['url' => $url]);
+
+        Mail::send($this->email, 'Password reset', $text, $html);
     }
 }
