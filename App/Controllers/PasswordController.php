@@ -55,6 +55,10 @@ class PasswordController extends Controller
 
         $user = User::findByPasswordReset($token);
 
-        s($user);
+        if ($user) {
+            View::renderTemplate('Password/reset.html.twig');
+        } else {
+            echo 'Password reset token invalid';
+        }
     }
 }
