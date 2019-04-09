@@ -398,4 +398,37 @@ class User extends Model
 
         Mail::send($this->email, 'Password reset', $text, $html);
     }
+
+    /**
+     * Find a user model by password reset token and expiry
+     *
+     * @param string $token Password reset token sent to user
+     *
+     * @return mixed User object if found and the token hasn't expired, null otherwise
+     * @throws Exception
+     */
+    public static function findByPasswordReset($token)
+    {
+        $token = new Token($token);
+        $hashedToken = $token->getHash();
+
+        $sql = 'SELECT * FROM `donors` WHERE `password_reset_hash` = :token_hash';
+
+        $connection = self::getDB();
+        $statement = $connection->prepare($sql);
+
+        $statement->bindValue(':token_hash', $hashedToken, PDO::PARAM_STR);
+
+        $statement->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
+        $statement->execute();
+
+        $user = $statement->fetch();
+
+        if ($user) {
+            if (strtotime($user->password_reset_expiry) > time()) {
+                return $user;
+            }
+        }
+    }
 }

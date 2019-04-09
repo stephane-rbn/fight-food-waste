@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\User;
 use Core\Controller;
 use Core\View;
+use Exception;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -46,11 +47,14 @@ class PasswordController extends Controller
      * Show the reset password form
      *
      * @return void
+     * @throws Exception
      */
     public function reset()
     {
         $token = $this->getRouteParams()['token'];
 
-        s($token);
+        $user = User::findByPasswordReset($token);
+
+        s($user);
     }
 }
