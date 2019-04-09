@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Mail;
 use Core\Controller;
 use Core\View;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Home Controller
@@ -29,6 +32,9 @@ class HomeController extends Controller
      * Show the index page
      *
      * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function index()
     {
