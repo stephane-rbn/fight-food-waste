@@ -1,0 +1,36 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block body %}
+
+    <h1>Profile</h1>
+
+    <dl>
+        <dt>First name</dt>
+        <dd>{{ user.firstName }}</dd>
+
+        <dt>Middle name</dt>
+        <dd>{{ user.middleName }}</dd>
+
+        <dt>Last name</dt>
+        <dd>{{ user.lastName }}</dd>
+
+        <dt>Email</dt>
+        <dd>{{ user.email }}</dd>
+
+        <dt>Company</dt>
+        <dd>{{ user.companyName }}</dd>
+
+        <dt>Phone number</dt>
+        <dd>{{ user.phoneNumber }}</dd>
+
+        <dt>Creation date</dt>
+        <dd>{{ user.createdAt|date("Y-m-d H:i") }}</dd>
+
+        <dt>Last update</dt>
+        <dd>{{ user.updateAt }}</dd>
+
+    </dl>
+
+{% endblock %}
