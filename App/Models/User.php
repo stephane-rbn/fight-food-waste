@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use App\Helper\Helper;
+use App\Mail;
 use App\Token;
 use Core\Model;
+use Core\View;
 use Exception;
 use PDO;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * User model
@@ -98,6 +103,13 @@ class User extends Model
     public $expiryTimestamp;
 
     /**
+     * User password reset token
+     *
+     * @var string
+     */
+    public $passwordResetToken;
+
+    /**
      * User constructor
      *
      * @param array $data Initial property values
@@ -125,15 +137,15 @@ class User extends Model
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
             $fields = [
-                'unique_id'    => Helper::generateUniqueId(),
-                'first_name'   => $this->firstName,
-                'middle_name'  => $this->middleName,
-                'last_name'    => $this->lastName,
+                'uniqueId'    => Helper::generateUniqueId(),
+                'firstName'   => $this->firstName,
+                'middleName'  => $this->middleName,
+                'lastName'    => $this->lastName,
                 'email'        => $this->email,
-                'company_name' => $this->companyName,
-                'phone_number' => $this->phoneNumber,
+                'companyName' => $this->companyName,
+                'phoneNumber' => $this->phoneNumber,
                 'password'     => $passwordHash,
-                'created_at'   => date('Y-m-d H:i:s'),
+                'createdAt'   => date('Y-m-d H:i:s'),
             ];
 
             return parent::insert('donors', $fields);
@@ -174,7 +186,7 @@ class User extends Model
         // Email validation: format and uniqueness
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             $this->errors[] = 'Email format should be valid.';
-        } else if (self::emailExists($this->email)) {
+        } else if (self::emailExists($this->email, $this->id ?? null)) {
             $this->errors[] = 'Email already used.';
         }
 
@@ -200,9 +212,9 @@ class User extends Model
         }
 
         // Password validations: identical
-        if ($this->password !== $this->passwordConfirmation) {
-            $this->errors[] = 'The password and the confirmation one need to be the same.';
-        }
+//        if ($this->password !== $this->passwordConfirmation) {
+//            $this->errors[] = 'The password and the confirmation one need to be the same.';
+//        }
     }
 
     /**
@@ -219,12 +231,21 @@ class User extends Model
      * See if a user record already exists with the specified email
      *
      * @param string $email email address to search for
+     * @param string $ignoreID Return false anyway if the record found has this ID
      *
      * @return bool True if a record already exists with the specified email, false otherwise
      */
-    public static function emailExists($email)
+    public static function emailExists($email, $ignoreID = null)
     {
-        return self::findByEmail($email) !== false;
+        $user = self::findByID($email);
+
+        if ($user) {
+            if ($user->id != $ignoreID) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -313,11 +334,144 @@ class User extends Model
         $this->expiryTimestamp = time() + 60 * 60 * 24 * 30;
 
         $fields = [
-            'token_hash' => $hashToken,
-            'donor_id'   => $this->id,
-            'expires_at' => date('Y-m-d H:i:s', $this->expiryTimestamp),
+            'tokenHash' => $hashToken,
+            'donorId'   => $this->id,
+            'expiresAt' => date('Y-m-d H:i:s', $this->expiryTimestamp),
         ];
 
         return parent::insert('remembered_logins', $fields);
+    }
+
+    /**
+     * Send password reset instructions to the user specified
+     *
+     * @param string $email The email address
+     *
+     * @return void
+     */
+    public static function sendPasswordReset($email)
+    {
+        $user = self::findByEmail($email);
+
+        if ($user) {
+            if ($user->startPasswordReset()) {
+                $user->sendPasswordResetEmail();
+            }
+        }
+    }
+
+    /**
+     * Start the password reset process by generating a new token and expiry
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function startPasswordReset()
+    {
+        $token = new Token();
+        $hashedToken = $token->getHash();
+        $this->passwordResetToken = $token->getValue();
+
+        // 2 hours from now
+        $expiryTimestamp = time() + 60 * 60 * 2;
+
+        $sql = 'UPDATE `donors`
+                SET `passwordResetHash` = :token_hash,
+                    `passwordResetExpiry` = :expires_at
+                WHERE `id` = :id';
+
+        $connection = self::getDB();
+        $statement = $connection->prepare($sql);
+
+        $statement->bindValue(':token_hash', $hashedToken, PDO::PARAM_STR);
+        $statement->bindValue(':expires_at', date('Y-m-d H:i:s', $expiryTimestamp), PDO::PARAM_STR);
+        $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+
+        return $statement->execute();
+    }
+
+    /**
+     * Send password reset instructions in an email to the user
+     *
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    protected function sendPasswordResetEmail()
+    {
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/password/reset/' . $this->passwordResetToken;
+
+        $text = View::getTemplate('Password/reset_email.txt', ['url' => $url]);
+        $html = View::getTemplate('Password/reset_email.html.twig', ['url' => $url]);
+
+        Mail::send($this->email, 'Password reset', $text, $html);
+    }
+
+    /**
+     * Find a user model by password reset token and expiry
+     *
+     * @param string $token Password reset token sent to user
+     *
+     * @return mixed User object if found and the token hasn't expired, null otherwise
+     * @throws Exception
+     */
+    public static function findByPasswordReset($token)
+    {
+        $token = new Token($token);
+        $hashedToken = $token->getHash();
+
+        $sql = 'SELECT * FROM `donors` WHERE `passwordResetHash` = :token_hash';
+
+        $connection = self::getDB();
+        $statement = $connection->prepare($sql);
+
+        $statement->bindValue(':token_hash', $hashedToken, PDO::PARAM_STR);
+
+        $statement->setFetchMode(PDO::FETCH_CLASS, get_called_class());
+
+        $statement->execute();
+
+        $user = $statement->fetch();
+
+        if ($user) {
+            if (strtotime($user->passwordResetExpiry) > time()) {
+                return $user;
+            }
+        }
+    }
+
+    /**
+     * Reset the password
+     *
+     * @param string $password The new password
+     *
+     * @return bool True if the password was updated successfully, false otherwise
+     */
+    public function resetUserPassword($password)
+    {
+        $this->password = $password;
+
+        $this->validate();
+
+        if (empty($this->errors)) {
+            $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
+
+            $sql = 'UPDATE `donors`
+                    SET `password` = :password_hash,
+                        `passwordResetHash` = NULL,
+                        `passwordResetExpiry` = NULL
+                    WHERE `id` = :id';
+
+            $connection = self::getDB();
+            $statement = $connection->prepare($sql);
+
+            $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+            $statement->bindValue(':password_hash', $passwordHash, PDO::PARAM_STR);
+
+            return $statement->execute();
+        }
+
+        return false;
     }
 }

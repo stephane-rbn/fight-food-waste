@@ -8,6 +8,9 @@ use App\Models\User;
 use Core\Controller;
 use Core\View;
 use Exception;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Login Controller
@@ -18,10 +21,17 @@ class LoginController extends Controller
      * Show the login page
      *
      * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function new()
     {
-        View::renderTemplate('Login/new.html.twig');
+        if (isset($_SESSION['user_id'])) {
+            $this->redirect('/');
+        } else {
+            View::renderTemplate('Login/new.html.twig');
+        }
     }
 
     /**

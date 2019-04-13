@@ -110,4 +110,36 @@ class Config
 
         return $secretKey;
     }
+
+    /**
+     * Mailgun API key
+     *
+     * @return string
+     */
+    static function mailgunAPIKey()
+    {
+        static $mailgunAPIKey = null;
+
+        if ($mailgunAPIKey === null) {
+            $mailgunAPIKey = $_ENV['MAILGUN_API_KEY'];
+        }
+
+        return $mailgunAPIKey;
+    }
+
+    /**
+     * Mailgun domain
+     *
+     * @return mixed
+     */
+    static function mailgunDomain()
+    {
+        static $mailgunDomain = null;
+
+        if ($mailgunDomain === null) {
+            $mailgunDomain = $_ENV['MAILGUN_DOMAIN'];
+        }
+
+        return $mailgunDomain;
+    }
 }
