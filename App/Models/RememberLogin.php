@@ -16,19 +16,19 @@ class RememberLogin extends Model
      * User ID
      * @var int
      */
-    public $user_id;
+    public $userId;
 
     /**
      * Token hash
      * @var string
      */
-    public $token_hash;
+    public $tokenHash;
 
     /**
      * Token expiry
      * @var string
      */
-    public $expired_at;
+    public $expiredAt;
 
     /**
      * Find a remembered login model by the token
@@ -43,7 +43,7 @@ class RememberLogin extends Model
         $token = new Token($token);
         $tokenHash = $token->getHash();
 
-        $sql = 'SELECT * FROM `remembered_logins` WHERE `token_hash` = :token_hash';
+        $sql = 'SELECT * FROM `remembered_logins` WHERE `tokenHash` = :token_hash';
 
         $connection = parent::getDB();
         $statement = $connection->prepare($sql);
@@ -63,7 +63,7 @@ class RememberLogin extends Model
      */
     public function getUser()
     {
-        return User::findByID($this->user_id);
+        return User::findByID($this->userId);
     }
 
     /**
@@ -73,7 +73,7 @@ class RememberLogin extends Model
      */
     public function hasExpired()
     {
-        return strtotime($this->expired_at) < time();
+        return strtotime($this->expiredAt) < time();
     }
 
     /**
@@ -83,12 +83,12 @@ class RememberLogin extends Model
      */
     public function delete()
     {
-        $sql = 'DELETE FROM `remembered_logins` WHERE `token_hash` = :token_hash';
+        $sql = 'DELETE FROM `remembered_logins` WHERE `tokenHash` = :token_hash';
 
         $connection = parent::getDB();
 
         $statement = $connection->prepare($sql);
-        $statement->bindValue(':token_hash', $this->token_hash, PDO::PARAM_STR);
+        $statement->bindValue(':token_hash', $this->tokenHash, PDO::PARAM_STR);
 
         $statement->execute();
     }

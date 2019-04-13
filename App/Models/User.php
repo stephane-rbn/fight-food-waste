@@ -137,15 +137,15 @@ class User extends Model
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
             $fields = [
-                'unique_id'    => Helper::generateUniqueId(),
-                'first_name'   => $this->firstName,
-                'middle_name'  => $this->middleName,
-                'last_name'    => $this->lastName,
+                'uniqueId'    => Helper::generateUniqueId(),
+                'firstName'   => $this->firstName,
+                'middleName'  => $this->middleName,
+                'lastName'    => $this->lastName,
                 'email'        => $this->email,
-                'company_name' => $this->companyName,
-                'phone_number' => $this->phoneNumber,
+                'companyName' => $this->companyName,
+                'phoneNumber' => $this->phoneNumber,
                 'password'     => $passwordHash,
-                'created_at'   => date('Y-m-d H:i:s'),
+                'createdAt'   => date('Y-m-d H:i:s'),
             ];
 
             return parent::insert('donors', $fields);
@@ -186,7 +186,7 @@ class User extends Model
         // Email validation: format and uniqueness
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             $this->errors[] = 'Email format should be valid.';
-        } else if (self::emailExists($this->email)) {
+        } else if (self::emailExists($this->email, $this->id ?? null)) {
             $this->errors[] = 'Email already used.';
         }
 
@@ -212,9 +212,9 @@ class User extends Model
         }
 
         // Password validations: identical
-        if ($this->password !== $this->passwordConfirmation) {
-            $this->errors[] = 'The password and the confirmation one need to be the same.';
-        }
+//        if ($this->password !== $this->passwordConfirmation) {
+//            $this->errors[] = 'The password and the confirmation one need to be the same.';
+//        }
     }
 
     /**
@@ -231,12 +231,21 @@ class User extends Model
      * See if a user record already exists with the specified email
      *
      * @param string $email email address to search for
+     * @param string $ignoreID Return false anyway if the record found has this ID
      *
      * @return bool True if a record already exists with the specified email, false otherwise
      */
-    public static function emailExists($email)
+    public static function emailExists($email, $ignoreID = null)
     {
-        return self::findByEmail($email) !== false;
+        $user = self::findByID($email);
+
+        if ($user) {
+            if ($user->id != $ignoreID) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -325,9 +334,9 @@ class User extends Model
         $this->expiryTimestamp = time() + 60 * 60 * 24 * 30;
 
         $fields = [
-            'token_hash' => $hashToken,
-            'donor_id'   => $this->id,
-            'expires_at' => date('Y-m-d H:i:s', $this->expiryTimestamp),
+            'tokenHash' => $hashToken,
+            'donorId'   => $this->id,
+            'expiresAt' => date('Y-m-d H:i:s', $this->expiryTimestamp),
         ];
 
         return parent::insert('remembered_logins', $fields);
@@ -367,8 +376,8 @@ class User extends Model
         $expiryTimestamp = time() + 60 * 60 * 2;
 
         $sql = 'UPDATE `donors`
-                SET `password_reset_hash` = :token_hash,
-                    `password_reset_expiry` = :expires_at
+                SET `passwordResetHash` = :token_hash,
+                    `passwordResetExpiry` = :expires_at
                 WHERE `id` = :id';
 
         $connection = self::getDB();
@@ -412,7 +421,7 @@ class User extends Model
         $token = new Token($token);
         $hashedToken = $token->getHash();
 
-        $sql = 'SELECT * FROM `donors` WHERE `password_reset_hash` = :token_hash';
+        $sql = 'SELECT * FROM `donors` WHERE `passwordResetHash` = :token_hash';
 
         $connection = self::getDB();
         $statement = $connection->prepare($sql);
@@ -426,9 +435,25 @@ class User extends Model
         $user = $statement->fetch();
 
         if ($user) {
-            if (strtotime($user->password_reset_expiry) > time()) {
+            if (strtotime($user->passwordResetExpiry) > time()) {
                 return $user;
             }
         }
+    }
+
+    /**
+     * Reset the password
+     *
+     * @param string $password The new password
+     *
+     * @return bool True if the password was updated successfully, false otherwise
+     */
+    public function resetUserPassword($password)
+    {
+        $this->password = $password;
+
+        $this->validate();
+
+        return empty($this->errors);
     }
 }

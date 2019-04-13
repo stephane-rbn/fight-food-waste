@@ -61,7 +61,7 @@ class PasswordController extends Controller
     }
 
     /**
-     * Reset the user's password
+     * Reset the user's password after submission
      *
      * @return void
      * @throws Exception
@@ -72,7 +72,14 @@ class PasswordController extends Controller
 
         $user = $this->getUserOrExit($token);
 
-        echo "Reset user's password here";
+        if ($user->resetUserPassword($_POST['password'])) {
+            echo "Password valid";
+        } else {
+            View::renderTemplate('Password/reset.html.twig', [
+                'token' => $token,
+                'user' => $user,
+            ]);
+        }
     }
 
     /**

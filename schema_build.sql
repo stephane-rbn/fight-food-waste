@@ -1,25 +1,28 @@
+DROP TABLE IF EXISTS `remembered_logins`;
+DROP TABLE IF EXISTS `donors`;
+
 CREATE TABLE `donors` (
   `id`                    INTEGER PRIMARY KEY AUTO_INCREMENT,
-  `unique_id`             VARCHAR(32) NOT NULL,
-  `first_name`            VARCHAR(60) NOT NULL,
-  `middle_name`           VARCHAR(60),
-  `last_name`             VARCHAR(60) NOT NULL,
+  `uniqueId`             VARCHAR(32) NOT NULL,
+  `firstName`            VARCHAR(60) NOT NULL,
+  `middleName`           VARCHAR(60),
+  `lastName`             VARCHAR(60) NOT NULL,
   `email`                 VARCHAR(255) NOT NULL UNIQUE,
-  `company_name`          VARCHAR(100),
-  `phone_number`          VARCHAR(60) NOT NULL,
+  `companyName`          VARCHAR(100),
+  `phoneNumber`          VARCHAR(60) NOT NULL,
   `password`              VARCHAR(255) NOT NULL,
-  `password_reset_hash`   VARCHAR(64) DEFAULT NULL UNIQUE,
-  `password_reset_expiry` DATETIME DEFAULT NULL,
+  `passwordResetHash`   VARCHAR(64) DEFAULT NULL UNIQUE,
+  `passwordResetExpiry` DATETIME DEFAULT NULL,
 #   `token`        VARCHAR(64),
 #   `confirmation` VARCHAR(64),
-#   `pickup_place_id` INTEGER REFERENCES `pickup_places` (`id`),
-#   `donor_type_id` INTEGER REFERENCES `donor_types` (`id`),
-  `created_at`   DATETIME,
-  `updated_at`   DATETIME
+#   `pickupPlaceId` INTEGER REFERENCES `pickup_places` (`id`),
+#   `donorTypeId` INTEGER REFERENCES `donor_types` (`id`),
+  `createdAt`   DATETIME,
+  `updatedAt`   DATETIME
 );
 
 CREATE TABLE `remembered_logins` (
-  `token_hash` VARCHAR(64) PRIMARY KEY,
-  `donor_id`   INTEGER NOT NULL REFERENCES `donors` (`id`) ON DELETE CASCADE,
-  `expires_at` DATETIME
+  `tokenHash` VARCHAR(64) PRIMARY KEY,
+  `donorId`   INTEGER NOT NULL REFERENCES `donors` (`id`) ON DELETE CASCADE,
+  `expiresAt` DATETIME
 );
