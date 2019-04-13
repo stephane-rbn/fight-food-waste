@@ -321,7 +321,7 @@ class User extends Model
     {
         $user = self::findByEmail(trim(strtolower($email)));
 
-        if ($user) {
+        if ($user && $user->isActive) {
             if (password_verify($password, $user->password)) {
                 return $user;
             }
