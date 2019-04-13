@@ -127,6 +127,7 @@ class User extends Model
      * Save the user model with the current property values
      *
      * @return bool
+     * @throws Exception
      */
     public function save()
     {
@@ -136,16 +137,20 @@ class User extends Model
         if (empty($this->errors)) {
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
+            $activationToken = new Token();
+            $hashedToken = $activationToken->getHash();
+
             $fields = [
-                'uniqueId'    => Helper::generateUniqueId(),
-                'firstName'   => $this->firstName,
-                'middleName'  => $this->middleName,
-                'lastName'    => $this->lastName,
-                'email'        => $this->email,
-                'companyName' => $this->companyName,
-                'phoneNumber' => $this->phoneNumber,
-                'password'     => $passwordHash,
-                'createdAt'   => date('Y-m-d H:i:s'),
+                'uniqueId'       => Helper::generateUniqueId(),
+                'firstName'      => $this->firstName,
+                'middleName'     => $this->middleName,
+                'lastName'       => $this->lastName,
+                'email'          => $this->email,
+                'companyName'    => $this->companyName,
+                'phoneNumber'    => $this->phoneNumber,
+                'password'       => $passwordHash,
+                'activationHash' => $hashedToken,
+                'createdAt'      => date('Y-m-d H:i:s'),
             ];
 
             return parent::insert('donors', $fields);
