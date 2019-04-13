@@ -454,6 +454,24 @@ class User extends Model
 
         $this->validate();
 
-        return empty($this->errors);
+        if (empty($this->errors)) {
+            $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
+
+            $sql = 'UPDATE `donors`
+                    SET `password` = :password_hash,
+                        `passwordResetHash` = NULL,
+                        `passwordResetExpiry` = NULL
+                    WHERE `id` = :id';
+
+            $connection = self::getDB();
+            $statement = $connection->prepare($sql);
+
+            $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+            $statement->bindValue(':password_hash', $passwordHash, PDO::PARAM_STR);
+
+            return $statement->execute();
+        }
+
+        return false;
     }
 }
