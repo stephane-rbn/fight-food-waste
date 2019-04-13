@@ -24,7 +24,11 @@ class RegisterController extends Controller
      */
     public function new()
     {
-        View::renderTemplate('Register/new.html.twig');
+        if (isset($_SESSION['user_id'])) {
+            View::renderTemplate('Home/index.html.twig');
+        } else {
+            View::renderTemplate('Register/new.html.twig');
+        }
     }
 
     /**

@@ -27,7 +27,11 @@ class LoginController extends Controller
      */
     public function new()
     {
-        View::renderTemplate('Login/new.html.twig');
+        if (isset($_SESSION['user_id'])) {
+            View::renderTemplate('Home/index.html.twig');
+        } else {
+            View::renderTemplate('Login/new.html.twig');
+        }
     }
 
     /**
