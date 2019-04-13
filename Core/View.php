@@ -7,6 +7,7 @@ use App\Flash;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use Twig\Extension\DebugExtension;
 
 /**
  * View
@@ -67,9 +68,12 @@ class View
 
         if ($twig === null) {
             $loader = new \Twig_Loader_Filesystem(dirname(__DIR__) . '/App/Views');
-            $twig = new \Twig_Environment($loader);
+            $twig = new \Twig_Environment($loader, [
+                'debug' => true,
+            ]);
             $twig->addGlobal('current_user', Auth::getUser());
             $twig->addGlobal('flash_messages', Flash::getMessages());
+            $twig->addExtension(new DebugExtension());
         }
 
         return $twig->render($template, $arguments);
