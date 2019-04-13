@@ -110,6 +110,13 @@ class User extends Model
     public $passwordResetToken;
 
     /**
+     * User account activation token
+     *
+     * @var string
+     */
+    private $activationToken;
+
+    /**
      * User constructor
      *
      * @param array $data Initial property values
@@ -127,6 +134,7 @@ class User extends Model
      * Save the user model with the current property values
      *
      * @return bool
+     * @throws Exception
      */
     public function save()
     {
@@ -136,16 +144,21 @@ class User extends Model
         if (empty($this->errors)) {
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
+            $activationToken = new Token();
+            $hashedToken = $activationToken->getHash();
+            $this->activationToken = $activationToken->getValue();
+
             $fields = [
-                'uniqueId'    => Helper::generateUniqueId(),
-                'firstName'   => $this->firstName,
-                'middleName'  => $this->middleName,
-                'lastName'    => $this->lastName,
-                'email'        => $this->email,
-                'companyName' => $this->companyName,
-                'phoneNumber' => $this->phoneNumber,
-                'password'     => $passwordHash,
-                'createdAt'   => date('Y-m-d H:i:s'),
+                'uniqueId'       => Helper::generateUniqueId(),
+                'firstName'      => $this->firstName,
+                'middleName'     => $this->middleName,
+                'lastName'       => $this->lastName,
+                'email'          => $this->email,
+                'companyName'    => $this->companyName,
+                'phoneNumber'    => $this->phoneNumber,
+                'password'       => $passwordHash,
+                'activationHash' => $hashedToken,
+                'createdAt'      => date('Y-m-d H:i:s'),
             ];
 
             return parent::insert('donors', $fields);
@@ -308,7 +321,7 @@ class User extends Model
     {
         $user = self::findByEmail(trim(strtolower($email)));
 
-        if ($user) {
+        if ($user && $user->isActive) {
             if (password_verify($password, $user->password)) {
                 return $user;
             }
@@ -473,5 +486,48 @@ class User extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Send an email to the user containing the activation link
+     *
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function sendActivationEmail()
+    {
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/register/activate/' . $this->activationToken;
+
+        $text = View::getTemplate('Register/activation_email.txt', ['url' => $url]);
+        $html = View::getTemplate('Register/activation_email.html.twig', ['url' => $url]);
+
+        Mail::send($this->email, 'Account activation', $text, $html);
+    }
+
+    /**
+     * Activate the user account with the specified activation token
+     *
+     * @param string $value Activation token from the URL
+     *
+     * @return void
+     * @throws Exception
+     */
+    public static function activateUser($value)
+    {
+        $activationToken = new Token($value);
+        $hashedToken = $activationToken->getHash();
+
+        $sql = 'UPDATE `donors`
+                SET `isActive` = 1, `activationHash` = NULL
+                WHERE `activationHash` = :hashed_token';
+
+        $connection = self::getDB();
+        $statement = $connection->prepare($sql);
+
+        $statement->bindValue(':hashed_token', $hashedToken, PDO::PARAM_STR);
+
+        $statement->execute();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\User;
 use Core\Controller;
 use Core\View;
+use Exception;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -44,6 +45,7 @@ class RegisterController extends Controller
         $user = new User($_POST);
 
         if ($user->save()) {
+            $user->sendActivationEmail();
             $this->redirect('/register/success');
         } else {
             s($user->getErrors());
@@ -64,5 +66,31 @@ class RegisterController extends Controller
     public function success()
     {
         View::renderTemplate('Register/success.html.twig');
+    }
+
+    /**
+     * Activate a new account
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function activate()
+    {
+        User::activateUser($this->getRouteParams()['token']);
+
+        $this->redirect('/register/activated');
+    }
+
+    /**
+     * Show the activation success page
+     *
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function activated()
+    {
+        View::renderTemplate('Register/activated.html.twig');
     }
 }
