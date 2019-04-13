@@ -44,6 +44,7 @@ class RegisterController extends Controller
         $user = new User($_POST);
 
         if ($user->save()) {
+            $user->sendActivationEmail();
             $this->redirect('/register/success');
         } else {
             s($user->getErrors());

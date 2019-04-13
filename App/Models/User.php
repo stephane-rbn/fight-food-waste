@@ -110,6 +110,13 @@ class User extends Model
     public $passwordResetToken;
 
     /**
+     * User account activation token
+     *
+     * @var string
+     */
+    private $activationToken;
+
+    /**
      * User constructor
      *
      * @param array $data Initial property values
@@ -139,6 +146,7 @@ class User extends Model
 
             $activationToken = new Token();
             $hashedToken = $activationToken->getHash();
+            $this->activationToken = $activationToken->getValue();
 
             $fields = [
                 'uniqueId'       => Helper::generateUniqueId(),
@@ -478,5 +486,23 @@ class User extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Send an email to the user containing the activation link
+     *
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function sendActivationEmail()
+    {
+        $url = 'http://' . $_SERVER['HTTP_HOST'] . '/register/activate/' . $this->activationToken;
+
+        $text = View::getTemplate('Register/activation_email.txt', ['url' => $url]);
+        $html = View::getTemplate('Register/activation_email.html.twig', ['url' => $url]);
+
+        Mail::send($this->email, 'Account activation', $text, $html);
     }
 }
