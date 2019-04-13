@@ -505,4 +505,29 @@ class User extends Model
 
         Mail::send($this->email, 'Account activation', $text, $html);
     }
+
+    /**
+     * Activate the user account with the specified activation token
+     *
+     * @param string $value Activation token from the URL
+     *
+     * @return void
+     * @throws Exception
+     */
+    public static function activateUser($value)
+    {
+        $activationToken = new Token($value);
+        $hashedToken = $activationToken->getHash();
+
+        $sql = 'UPDATE `donors`
+                SET `isActive` = 1, `activationHash` = NULL
+                WHERE `activationHash` = :hashed_token';
+
+        $connection = self::getDB();
+        $statement = $connection->prepare($sql);
+
+        $statement->bindValue(':hashed_token', $hashedToken, PDO::PARAM_STR);
+
+        $statement->execute();
+    }
 }
