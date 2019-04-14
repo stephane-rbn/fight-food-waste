@@ -11,6 +11,9 @@
 <body>
     <nav>
         <a href="/">Home</a> |
+        {% if current_user %}
+            <a href="/logout">Logout</a>
+        {% endif %}
     </nav>
 
     {% for message in flash_messages %}
