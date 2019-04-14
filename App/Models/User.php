@@ -225,9 +225,11 @@ class User extends Model
         }
 
         // Password validations: identical
-//        if ($this->password !== $this->passwordConfirmation) {
-//            $this->errors[] = 'The password and the confirmation one need to be the same.';
-//        }
+        if (!isset($user->id)) {
+            if ($this->password !== $this->passwordConfirmation) {
+                $this->errors[] = 'The password and the confirmation one need to be the same.';
+            }
+        }
     }
 
     /**

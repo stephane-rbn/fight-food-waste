@@ -27,4 +27,19 @@ class ProfileController extends AuthenticatedController
             'user' => Auth::getUser(),
         ]);
     }
+
+    /**
+     * Show the form for editing the profile
+     *
+     * @return void
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    public function edit()
+    {
+        View::renderTemplate('Profile/edit.html.twig', [
+            'user' => Auth::getUser(),
+        ]);
+    }
 }
