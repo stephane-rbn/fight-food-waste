@@ -10,7 +10,7 @@ CREATE TABLE `donors` (
   `email`               VARCHAR(255) NOT NULL UNIQUE,
   `companyName`         VARCHAR(100),
   `phoneNumber`         VARCHAR(60) NOT NULL,
-  `password`            VARCHAR(255) NOT NULL,
+  `passwordHash`        VARCHAR(255) NOT NULL,
   `passwordResetHash`   VARCHAR(64) DEFAULT NULL UNIQUE,
   `passwordResetExpiry` DATETIME DEFAULT NULL,
   `activationHash`      VARCHAR(64) DEFAULT NULL UNIQUE,

@@ -33,6 +33,13 @@ class User extends Model
     public $id;
 
     /**
+     * User unique ID
+     *
+     * @var string
+     */
+    public $uniqueId;
+
+    /**
      * User first name
      *
      * @var string
@@ -156,7 +163,7 @@ class User extends Model
                 'email'          => $this->email,
                 'companyName'    => $this->companyName,
                 'phoneNumber'    => $this->phoneNumber,
-                'password'       => $passwordHash,
+                'passwordHash'   => $passwordHash,
                 'activationHash' => $hashedToken,
                 'createdAt'      => date('Y-m-d H:i:s'),
             ];
@@ -216,18 +223,22 @@ class User extends Model
         }
 
         // Password validations: between 8 and 50 characters in length, one letter and one number
-        if (strlen($this->password) < 8 || strlen($this->password) > 50) {
-            $this->errors[] = 'Password should be between 8 and 50 characters in length.';
-        } else if (preg_match('/[a-z]/i', $this->password === 0)) {
-            $this->errors[] = 'Password needs at least one letter.';
-        } else if (preg_match('/\d/', $this->password === 0)) {
-            $this->errors[] = 'Password needs at least one number.';
+        if (isset($this->password)) {
+            if (strlen($this->password) < 8 || strlen($this->password) > 50) {
+                $this->errors[] = 'Password should be between 8 and 50 characters in length.';
+            } else if (preg_match('/[a-z]/i', $this->password === 0)) {
+                $this->errors[] = 'Password needs at least one letter.';
+            } else if (preg_match('/\d/', $this->password === 0)) {
+                $this->errors[] = 'Password needs at least one number.';
+            }
         }
 
         // Password validations: identical
-//        if ($this->password !== $this->passwordConfirmation) {
-//            $this->errors[] = 'The password and the confirmation one need to be the same.';
-//        }
+        if (isset($this->password)) {
+            if ($this->password !== $this->passwordConfirmation) {
+                $this->errors[] = 'The password and the confirmation one need to be the same.';
+            }
+        }
     }
 
     /**
@@ -322,7 +333,7 @@ class User extends Model
         $user = self::findByEmail(trim(strtolower($email)));
 
         if ($user && $user->isActive) {
-            if (password_verify($password, $user->password)) {
+            if (password_verify($password, $user->passwordHash)) {
                 return $user;
             }
         }
@@ -471,7 +482,7 @@ class User extends Model
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
             $sql = 'UPDATE `donors`
-                    SET `password` = :password_hash,
+                    SET `passwordHash` = :password_hash,
                         `passwordResetHash` = NULL,
                         `passwordResetExpiry` = NULL
                     WHERE `id` = :id';
@@ -529,5 +540,66 @@ class User extends Model
         $statement->bindValue(':hashed_token', $hashedToken, PDO::PARAM_STR);
 
         $statement->execute();
+    }
+
+    /**
+     * Update the user's profile
+     *
+     * @param array $data Data from the edit profile form
+     *
+     * @return bool True if the data was updated, false otherwise
+     */
+    public function updateProfile($data)
+    {
+        $this->firstName   = $data['firstName'];
+        $this->middleName  = $data['middleName'];
+        $this->lastName    = $data['lastName'];
+        $this->email       = $data['email'];
+        $this->phoneNumber = $data['phoneNumber'];
+        $this->companyName = $data['companyName'];
+
+        if ($data['password'] != '') {
+            $this->password = $data['password'];
+        }
+
+        $this->validate();
+
+        if (empty($this->errors)) {
+            $sql = 'UPDATE `donors`
+                    SET firstName   = :first_name,
+                        middleName  = :middle_name,
+                        lastName    = :last_name,
+                        email       = :email,
+                        phoneNumber = :phone_number,
+                        companyName = :company_name,
+                        updatedAt   = :updated_at';
+
+            if (isset($this->password)) {
+                $sql .= ', passwordHash = :password_hash';
+            }
+
+            $sql .= "\nWHERE id = :id";
+
+            $connection = self::getDB();
+            $statement = $connection->prepare($sql);
+
+            $statement->bindValue(':first_name', $this->firstName, PDO::PARAM_STR);
+            $statement->bindValue(':middle_name', $this->middleName, PDO::PARAM_STR);
+            $statement->bindValue(':last_name', $this->lastName, PDO::PARAM_STR);
+            $statement->bindValue(':email', $this->email, PDO::PARAM_STR);
+            $statement->bindValue(':phone_number', $this->phoneNumber, PDO::PARAM_STR);
+            $statement->bindValue(':company_name', $this->companyName, PDO::PARAM_STR);
+            $statement->bindValue(':updated_at', date('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $statement->bindValue(':id', $this->id, PDO::PARAM_INT);
+
+            if (isset($this->password)) {
+                $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
+                $statement->bindValue(':password_hash', $passwordHash, PDO::PARAM_STR);
+            }
+
+            return $statement->execute();
+        }
+
+        return false;
     }
 }
