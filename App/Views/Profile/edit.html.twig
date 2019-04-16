@@ -15,7 +15,7 @@
         </ul>
     {% endif %}
 
-    <form method="POST">
+    <form action="/profile/update" method="POST">
         <div>
             <label for="inputFirstName">First name</label>
             <input type="text" id="inputFirstName" name="firstName" placeholder="First name" value="{{ user.firstName }}" required>
@@ -55,11 +55,11 @@
             <span id="helpBlock">Leave blank to keep current password</span>
         </div>
 
-{#        <div>#}
-{#            <label for="inputPasswordConfirmation">Repeat password</label>#}
-{#            <input type="password" id="inputPasswordConfirmation" name="passwordConfirmation"#}
-{#                   placeholder="Repeat password">#}
-{#        </div>#}
+        <div>
+            <label for="inputPasswordConfirmation">Repeat password</label>
+            <input type="password" id="inputPasswordConfirmation" name="passwordConfirmation"
+                   placeholder="Repeat password">
+        </div>
 
         <button type="submit">Save modifications</button>
         <a href="/profile/show">Cancel</a>
