@@ -10,10 +10,13 @@
 </head>
 <body>
     <nav>
-        <a href="/">Home</a> |
+        <ul>
+            <li><a href="/">Home</a></li>
         {% if current_user %}
-            <a href="/logout">Logout</a>
+            <li><a href="/profile/show">Profile</a></li>
+            <li><a href="/logout">Logout</a></li>
         {% endif %}
+        </ul>
     </nav>
 
     {% for message in flash_messages %}
