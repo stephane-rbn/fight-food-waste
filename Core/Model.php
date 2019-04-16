@@ -74,7 +74,7 @@ abstract class Model
     }
 
 //    Commented examples
-//    $users = parent::find('donors', [
+//    $users = parent::find('users', [
 //        'conditions' => '',
 //        'bind' => [],
 //        'order' => 'first_name',

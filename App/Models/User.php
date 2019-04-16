@@ -168,7 +168,7 @@ class User extends Model
                 'createdAt'      => date('Y-m-d H:i:s'),
             ];
 
-            return parent::insert('donors', $fields);
+            return parent::insert('users', $fields);
         }
 
         return false;
@@ -281,7 +281,7 @@ class User extends Model
      */
     public static function findByEmail($email)
     {
-        $sql = 'SELECT * FROM `donors` WHERE email = :email';
+        $sql = 'SELECT * FROM `users` WHERE email = :email';
 
         // Database connection
         $connection = parent::getDB();
@@ -304,7 +304,7 @@ class User extends Model
      */
     public static function findByID($id)
     {
-        $sql = 'SELECT * FROM `donors` WHERE id = :id';
+        $sql = 'SELECT * FROM `users` WHERE id = :id';
 
         // Database connection
         $connection = parent::getDB();
@@ -359,7 +359,7 @@ class User extends Model
 
         $fields = [
             'tokenHash' => $hashToken,
-            'donorId'   => $this->id,
+            'userId'    => $this->id,
             'expiresAt' => date('Y-m-d H:i:s', $this->expiryTimestamp),
         ];
 
@@ -399,7 +399,7 @@ class User extends Model
         // 2 hours from now
         $expiryTimestamp = time() + 60 * 60 * 2;
 
-        $sql = 'UPDATE `donors`
+        $sql = 'UPDATE `users`
                 SET `passwordResetHash` = :token_hash,
                     `passwordResetExpiry` = :expires_at
                 WHERE `id` = :id';
@@ -445,7 +445,7 @@ class User extends Model
         $token = new Token($token);
         $hashedToken = $token->getHash();
 
-        $sql = 'SELECT * FROM `donors` WHERE `passwordResetHash` = :token_hash';
+        $sql = 'SELECT * FROM `users` WHERE `passwordResetHash` = :token_hash';
 
         $connection = self::getDB();
         $statement = $connection->prepare($sql);
@@ -475,13 +475,14 @@ class User extends Model
     public function resetUserPassword($password)
     {
         $this->password = $password;
+//        $this->passwordConfirmation = $password;
 
         $this->validate();
 
         if (empty($this->errors)) {
             $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
 
-            $sql = 'UPDATE `donors`
+            $sql = 'UPDATE `users`
                     SET `passwordHash` = :password_hash,
                         `passwordResetHash` = NULL,
                         `passwordResetExpiry` = NULL
@@ -530,7 +531,7 @@ class User extends Model
         $activationToken = new Token($value);
         $hashedToken = $activationToken->getHash();
 
-        $sql = 'UPDATE `donors`
+        $sql = 'UPDATE `users`
                 SET `isActive` = 1, `activationHash` = NULL
                 WHERE `activationHash` = :hashed_token';
 
@@ -558,14 +559,14 @@ class User extends Model
         $this->phoneNumber = $data['phoneNumber'];
         $this->companyName = $data['companyName'];
 
-        if ($data['password'] != '') {
+        if (!empty($data['password'])) {
             $this->password = $data['password'];
         }
 
         $this->validate();
 
         if (empty($this->errors)) {
-            $sql = 'UPDATE `donors`
+            $sql = 'UPDATE `users`
                     SET firstName   = :first_name,
                         middleName  = :middle_name,
                         lastName    = :last_name,

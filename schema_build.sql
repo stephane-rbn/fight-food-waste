@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `remembered_logins`;
-DROP TABLE IF EXISTS `donors`;
+DROP TABLE IF EXISTS `users`;
 
-CREATE TABLE `donors` (
+CREATE TABLE `users` (
   `id`                  INTEGER PRIMARY KEY AUTO_INCREMENT,
   `uniqueId`            VARCHAR(32) NOT NULL,
   `firstName`           VARCHAR(60) NOT NULL,
@@ -18,11 +18,11 @@ CREATE TABLE `donors` (
   `createdAt`           DATETIME,
   `updatedAt`           DATETIME
 #   `pickupPlaceId` INTEGER REFERENCES `pickup_places` (`id`),
-#   `donorTypeId` INTEGER REFERENCES `donor_types` (`id`),
+#   `userTypeId` INTEGER REFERENCES `user_types` (`id`),
 );
 
 CREATE TABLE `remembered_logins` (
   `tokenHash` VARCHAR(64) PRIMARY KEY,
-  `donorId`   INTEGER NOT NULL REFERENCES `donors` (`id`) ON DELETE CASCADE,
+  `userId`   INTEGER NOT NULL REFERENCES `users` (`id`) ON DELETE CASCADE,
   `expiresAt` DATETIME
 );
