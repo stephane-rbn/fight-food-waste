@@ -15,6 +15,18 @@ use Twig\Error\SyntaxError;
  */
 class ProfileController extends AuthenticatedController
 {
+    private $user;
+
+    /**
+     * Before filter - called before each action method
+     */
+    protected function before()
+    {
+        parent::before();
+
+        $this->user = Auth::getUser();
+    }
+
     /**
      * Show the profile
      *
@@ -26,7 +38,7 @@ class ProfileController extends AuthenticatedController
     public function show()
     {
         View::renderTemplate('Profile/show.html.twig', [
-            'user' => Auth::getUser(),
+            'user' => $this->user,
         ]);
     }
 
@@ -41,7 +53,7 @@ class ProfileController extends AuthenticatedController
     public function edit()
     {
         View::renderTemplate('Profile/edit.html.twig', [
-            'user' => Auth::getUser(),
+            'user' => $this->user,
         ]);
     }
 
@@ -53,14 +65,12 @@ class ProfileController extends AuthenticatedController
      */
     public function update()
     {
-        $user = Auth::getUser();
-
-        if ($user->updateProfile($_POST)) {
+        if ($this->user->updateProfile($_POST)) {
             Flash::addMessage('Changes saved');
             $this->redirect('/profile/show');
         } else {
             View::renderTemplate('Profile/edit.html.twig', [
-                'user' => $user,
+                'user' => $this->user,
             ]);
         }
     }
