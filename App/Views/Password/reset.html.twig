@@ -19,14 +19,14 @@
 
         <input type="hidden" name="token" value="{{ token }}">
 
-        <div>
+        <div class="form-group">
             <label for="inputPassword">Password</label>
-            <input type="password" id="inputPassword" name="password" placeholder="Password"
+            <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password"
                    pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
                    title="Minimum 8 chars, at least one letter and number." required>
         </div>
 
-        <button type="submit">Reset password</button>
+        <button type="submit" class="btn btn-primary">Reset password</button>
 
     </form>
 

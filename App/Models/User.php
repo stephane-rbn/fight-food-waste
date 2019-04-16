@@ -475,7 +475,7 @@ class User extends Model
     public function resetUserPassword($password)
     {
         $this->password = $password;
-//        $this->passwordConfirmation = $password;
+        $this->passwordConfirmation = $password;
 
         $this->validate();
 
@@ -561,6 +561,7 @@ class User extends Model
 
         if (!empty($data['password'])) {
             $this->password = $data['password'];
+            $this->passwordConfirmation = $data['passwordConfirmation'];
         }
 
         $this->validate();
